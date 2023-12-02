@@ -46,20 +46,22 @@ public class DurationCalculator {
                 modifiedLines.add(modifiedLine);
             }
             StringBuilder outputBuilder = new StringBuilder();
+            outputBuilder.append("-filter_complex \"");
             for (int k = 0; k < modifiedLines.size() - 1; k++) {
                 //System.out.print(("[clip"+k+"]"+"["+(k+1)+":v]"+"xfade=transition=fade:duration=1:offset="+modifiedLines.get(k)+",format=yuv420p"+"[clip"+(k+1)+"]"+";").replace("[clip0]", "[0:v]"));
-                String videoString =("[clip"+k+"]"+"["+(k+1)+":v]"+"xfade=transition=fade:duration=1:offset="+modifiedLines.get(k)+",format=yuv420p"+"[clip"+(k+1)+"]"+";").replace("[clip0]", "[0:v]");
+                String videoString =("[vclip"+k+"]"+"["+(k+1)+":v]"+"xfade=transition=fade:duration=1:offset="+modifiedLines.get(k)+",format=yuv420p"+"[vclip"+(k+1)+"]"+";").replace("[vclip0]", "[0:v]");
                 outputBuilder.append(videoString);
                 //outputArray[index] = outputString;
                 //index++;
             }
             for (int k = 0; k < modifiedLines.size() - 1; k++) {
                 //System.out.print((("[clip"+k+"]"+"["+(k+1)+":a]"+"acrossfade=d=1"+"[clip"+(k+1)+"]"+";").replace("[clip0]", "[0:a]")));
-                String audioString =("[clip"+k+"]"+"["+(k+1)+":a]"+"acrossfade=d=1"+"[clip"+(k+1)+"]"+";").replace("[clip0]", "[0:a]");
-                outputBuilder.append(audioString);
+                String audioString =("[aclip"+k+"]"+"["+(k+1)+":a]"+"acrossfade=d=1"+"[aclip"+(k+1)+"]"+";").replace("[aclip0]", "[0:a]");
+                outputBuilder.append(audioString.toString().substring(0, audioString.toString().length() - 1));
             
             }
-            System.out.println(outputBuilder.toString());
+            outputBuilder.append("\" -c:v h264_nvenc -b:v 60M -bf 2 -preset slow -c:a aac "+"-map \"[vclip"+(modifiedLines.size()-1)+"]\""+" -map \"[aclip"+(modifiedLines.size()-1)+"]\""+" -movflags +faststart ");
+            System.out.println(outputBuilder);
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
         }
