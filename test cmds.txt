@@ -1,0 +1,20 @@
+ffmpeg -y -f concat -safe 0 -i list.txt -c copy output.mp4
+
+ffmpeg -y -i 1.mp4 -i 2.mp4 -filter_complex xfade=transition=fade:duration=2:offset=5 output.mp4
+
+ffmpeg -y -i 1.mp4 -i 2.mp4 -filter_complex xfade=transition=fade:duration=2:offset=5 -c:v h264_nvenc -profile:v high -b:v 6M -minrate 6M -maxrate 6M -bufsize 12M -bf 2 -preset slow output.mp4
+
+ffmpeg -y -i 1.mp4 -i 2.mp4 -filter_complex xfade=transition=fade:duration=1:offset=1 -c:v h264_nvenc -profile:v high -b:v 60M -bf 2 -preset slow output.mp4
+
+
+ffprobe -i 1.mp4 -show_entries format=duration -v quiet -of csv="p=0"
+FOR /F "tokens=2 delims='" %a IN (list.txt) do (ffprobe -i %a -show_entries format=duration -v quiet -of csv="p=0")
+
+ffmpeg -y -i 1.mp4 -i 2.mp4 -i 3.mp4 -filter_complex xfade=transition=fade:duration=1:offset=15.5 -c:v h264_nvenc -profile:v high -b:v 60M -bf 2 -preset slow output.mp4
+
+
+ffmpeg -y -i 1.mp4 -i 2.mp4 -i 3.mp4 -filter_complex "[0:v]xfade=transition=fade:duration=1:offset=15.5[fade1];[1:v]xfade=transition=fade:duration=1:offset=15.5[fade2];[2:v]xfade=transition=fade:duration=1:offset=15.5[fade3]" -c:v h264_nvenc -profile:v high -b:v 60M -bf 2 -preset slow -c:a aac -strict experimental output.mp4
+
+ffmpeg -y -i 1.mp4 -i 2.mp4 -i 3.mp4 -filter_complex "[0:v]fade=t=out:st=14:d=1[v0];[1:v]fade=in:st=0:d=1,fade=t=out:st=14:d=1[v1];[2:v]fade=in:st=0:d=1[fade3];[v0][v1][fade3]concat=n=3:v=1:a=0[output]" -c:v h264_nvenc -b:v 60M -bf 2 -preset slow -c:a aac -strict experimental output.mp4
+
+

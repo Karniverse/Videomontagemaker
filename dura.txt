@@ -1,0 +1,25 @@
+(for %%i in (*.mp4) do @echo file '%%i') > list.txt
+
+set prefix=":v]xfade=transition=fade:duration=1:offset="
+echo %prefix%
+FOR /F "tokens=2 delims='" %a IN (list.txt) do ( ffprobe -i %a -show_entries format=duration -v quiet -of csv="p=0" >> time.txt)
+
+
+
+dir /b *.mp4
+
+FOR /F "tokens=1" %g IN ('dir /b *.mp4') do (ffprobe -i %g -show_entries format=duration -v quiet -of csv="p=0")
+
+
+
+FOR /F "tokens=2 delims='" %a IN (list.txt) do (FOR /F "tokens=1" %g IN ('ffprobe -i %a -show_entries format=duration -v quiet -of csv="p=0"') do (echo ":v]xfade=transition=fade:duration=1:offset="%g>>durations.txt))
+
+
+
+
+echo ":v]xfade=transition=fade:duration=1:offset=" && ffprobe -i %a -show_entries format=duration -v quiet -of csv="p=0" >> durations.txt)
+
+
+
+
+echo ":v]xfade=transition=fade:duration=1:offset="(
